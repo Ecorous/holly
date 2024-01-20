@@ -5,7 +5,7 @@ import kotlinx.datetime.LocalDateTime
 import org.ecorous.holly.Frequency
 import kotlin.time.Duration.Companion.seconds
 
-class DiscordRepeatingReminder(
+open class DiscordRepeatingReminder(
 	dueTime: Instant,
 	title: String,
 	message: String,

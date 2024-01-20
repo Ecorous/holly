@@ -4,19 +4,18 @@ import com.kotlindiscord.kord.extensions.DISCORD_RED
 import com.kotlindiscord.kord.extensions.commands.Arguments
 import com.kotlindiscord.kord.extensions.commands.application.slash.publicSubCommand
 import com.kotlindiscord.kord.extensions.commands.converters.impl.channel
-import com.kotlindiscord.kord.extensions.commands.converters.impl.coalescingDefaultingString
-import com.kotlindiscord.kord.extensions.commands.converters.impl.defaultingString
-import com.kotlindiscord.kord.extensions.commands.converters.impl.user
-import com.kotlindiscord.kord.extensions.components.*
 import com.kotlindiscord.kord.extensions.extensions.Extension
+import com.kotlindiscord.kord.extensions.extensions.event
 import com.kotlindiscord.kord.extensions.extensions.publicSlashCommand
-import dev.kord.common.Color
-import dev.kord.rest.builder.message.*
-import kotlinx.datetime.LocalDateTime
-import kotlinx.datetime.toKotlinLocalDateTime
-import org.ecorous.holly.*
+import dev.kord.core.behavior.interaction.respondEphemeral
+import dev.kord.core.event.interaction.ButtonInteractionCreateEvent
+import dev.kord.rest.builder.message.EmbedBuilder
+import dev.kord.rest.builder.message.embed
+import org.ecorous.holly.DB
+import org.ecorous.holly.ServerConfig
+import org.ecorous.holly.TEST_SERVER_ID
+import org.ecorous.holly.reminders.CompletionReminder
 import org.ecorous.holly.reminders.Reminders
-import java.time.Instant
 
 val SERVER_CONFIG_ERROR: EmbedBuilder.() -> Unit = {
 	title = "Error"
@@ -63,6 +62,34 @@ class TestExtension : Extension() {
 				}
 			}
 		}
+		event<ButtonInteractionCreateEvent> {
+			action {
+				println("hewwo! ${event.interaction.componentId}, ${event.interaction.componentType}")
+				Reminders.reminders.filter { it is CompletionReminder  }.filter {
+					val r = it as? CompletionReminder
+					if (r != null) {
+						r.buttonId == event.interaction.componentId
+					} else {
+						false
+					}
+				}.forEach { reminder ->
+					val r = reminder as? CompletionReminder
+					if (r != null) {
+						println("r1")
+						println(r.buttonId)
+						if (reminder.completed) {
+							event.interaction.respondEphemeral { content = "Reminder already completed!" }
+							return@action
+						}
+						Reminders.complete(r)
+						event.interaction.respondEphemeral { content = "Completed reminder!" }
+					}
+					return@action
+
+				}
+			}
+		}
+
 	}
 
 	inner class ServerConfigArgs : Arguments() {

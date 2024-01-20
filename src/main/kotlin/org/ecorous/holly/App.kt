@@ -3,22 +3,19 @@
  */
 package org.ecorous.holly
 
+import com.kotlindiscord.kord.extensions.DISCORD_GREEN
 import com.kotlindiscord.kord.extensions.ExtensibleBot
 import com.kotlindiscord.kord.extensions.utils.env
+import dev.kord.common.entity.ButtonStyle
 import dev.kord.common.entity.Snowflake
+import dev.kord.rest.builder.message.actionRow
+import dev.kord.rest.builder.message.embed
 import kotlinx.coroutines.DelicateCoroutinesApi
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 import kotlinx.datetime.*
 import org.ecorous.holly.extensions.TestExtension
-import org.ecorous.holly.reminders.DiscordReminder
-import org.ecorous.holly.reminders.DiscordRepeatingReminder
-import org.ecorous.holly.reminders.Reminder
-import org.ecorous.holly.reminders.Reminders
+import org.ecorous.holly.reminders.*
 import java.util.Timer
-import kotlin.concurrent.schedule
 import kotlin.time.Duration.Companion.minutes
-import kotlin.time.Duration.Companion.seconds
 
 val TEST_SERVER_ID = Snowflake(
 	env("TEST_SERVER").toLong()  // Get the test server ID from the env vars or a .env file
@@ -58,30 +55,48 @@ suspend fun main() {
 			Reminders.checkAll()
 		}
 	}*/
-	Reminders.schedule(DiscordReminder.new {
+	/*Reminders.schedule(CompletionReminder.new {
 		title = "Test Reminder (non-repeating)"
 		message = "This is a test reminder!"
 		frequency = Frequency(FrequencyType.MINUTE, 1)
 		lastCompleted = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
 		dueTime = Clock.System.now() + 1.minutes
-	})
-	Reminders.schedule(DiscordRepeatingReminder.new {
+		completion {
+			embed {
+				title = "Reminder completed!"
+				description = "Your reminder \"${title}\" was completed."
+				color = DISCORD_GREEN
+			}
+		}
+	})*/
+	Reminders.schedule(CompletionReminder.new {
 		title = "Test Reminder (repeating)"
 		message = "This is a test reminder!"
-		frequency = Frequency(FrequencyType.MINUTE, 1)
+		frequency = Frequency(FrequencyType.MINUTE, 2)
 		lastCompleted = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
-		dueTime = Clock.System.now() + 1.minutes
+		dueTime = Clock.System.now() + 2.minutes
+		completion {
+			embed {
+				title = "Reminder completed!"
+				description = "Your reminder \"${title}\" was completed."
+				color = DISCORD_GREEN
+			}
+			actionRow {
+				interactionButton(ButtonStyle.Success, "disabled") {
+					label = "Complete"
+					disabled = true
+				}
+			}
+		}
 	})
 	bot.start()
-
-
 }
 
-val LocalDateTime.timeFormat: String
-	get() = "$hour:$minute:$second"
+val LocalDateTime.timeFormat: String // should be HH:MM:SS
+	get() = "${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}:${second.toString().padStart(2, '0')}"
 
-val LocalDateTime.dateFormat: String
-	get() = "$dayOfMonth/$monthNumber/$year"
+val LocalDateTime.dateFormat: String// should be DD/MM/YYYY
+	get() = "${dayOfMonth.toString().padStart(2, '0')}/${monthNumber.toString().padStart(2, '0')}/${year}"
 
 val LocalDateTime.dateTimeFormat: String
 	get() = "$dateFormat $timeFormat"

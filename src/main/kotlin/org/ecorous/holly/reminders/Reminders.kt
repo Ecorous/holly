@@ -1,6 +1,8 @@
 package org.ecorous.holly.reminders
 
 import dev.kord.core.behavior.channel.createMessage
+import dev.kord.core.behavior.edit
+import dev.kord.core.entity.Message
 import dev.kord.core.entity.channel.MessageChannel
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
@@ -15,8 +17,8 @@ import kotlin.time.Duration.Companion.seconds
 object Reminders {
 	val reminders: MutableList<Reminder> = ArrayList()
 
-	suspend fun send(reminder: DiscordReminder, channel: MessageChannel) {
-		channel.createMessage(reminder.format())
+	suspend fun send(reminder: DiscordReminder, channel: MessageChannel): Message {
+		return channel.createMessage(reminder.format())
 	}
 
 	val Duration.milliseconds: Long
@@ -43,6 +45,19 @@ object Reminders {
 					reminders.remove(it)
 				}
 			} }
+	}
+
+	fun cancel(reminder: Reminder) {
+		reminders.remove(reminder)
+	}
+
+	suspend fun complete(reminder: CompletionReminder) {
+		reminder.completed = true
+		reminder.completionReminder?.let { cancel(it) }
+//		DB.getConfig(TEST_SERVER_ID)?.remindersChannelId?.let {
+//			bot.kordRef.getChannelOf<MessageChannel>(it)?.createMessage(reminder.onCompletion)
+//		}
+		reminder.reminderMessage?.edit(reminder.onCompletion)
 	}
 }
 
