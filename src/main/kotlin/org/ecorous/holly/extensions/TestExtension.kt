@@ -215,7 +215,7 @@ class TestExtension : Extension() {
 		}
 		val repeatingInterval by coalescingOptionalDuration {
 			name = "repeat_interval"
-			description = "Interval to remind you again, to use set repeating to true"
+			description = "Interval to remind you again, to use set the mode to repeating"
 		}
 		val mode by optionalStringChoice {
 			name = "mode"
