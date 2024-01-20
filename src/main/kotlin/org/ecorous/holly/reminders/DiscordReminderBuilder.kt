@@ -14,7 +14,7 @@ class DiscordReminderBuilder {
 
 
 	fun build(): DiscordReminder {
-		return DiscordReminder(dueTime!!, title!!, message!!, frequency!!, lastCompleted!!)
+		return DiscordReminder(dueTime!!, title!!, message!!, lastCompleted!!)
 	}
 	fun buildRepeating(): DiscordRepeatingReminder {
 		return DiscordRepeatingReminder(dueTime!!, title!!, message!!, frequency!!, lastCompleted!!)
