@@ -113,6 +113,7 @@ class CompletionReminder(
 	}
 
 	override suspend fun run() {
+		completed = false
 		buttonId = refreshButtonId()
 		super.run()
 		completionReminder?.let { Reminders.cancel(it) }
