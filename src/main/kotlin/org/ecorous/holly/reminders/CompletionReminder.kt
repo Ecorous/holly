@@ -29,6 +29,7 @@ class CompletionReminder(
 	var completed = false
 	var completionReminder: Reminder? = null
 	var buttonId: String = ""
+	val random = Random(324)
 	/*constructor(
 		dueTime: Instant?,
 		title: String?,
@@ -45,11 +46,8 @@ class CompletionReminder(
 	}*/
 
 	fun refreshButtonId(): String {
-		return "reminder_complete_${Random(324).nextInt(0, 200000)}"
-	}
-
-	init {
-
+		val i = random.nextInt()
+		return "reminder_complete_$i"
 	}
 
 	override fun format(): MessageCreateBuilder.() -> Unit {
