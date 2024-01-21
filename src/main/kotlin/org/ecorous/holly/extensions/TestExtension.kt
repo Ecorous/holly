@@ -55,7 +55,7 @@ class TestExtension : Extension() {
 			name = "config"
 			description = "Server config commands"
 			guild(TEST_SERVER_ID)
-			/*publicSubCommand(::ServerConfigArgs) {
+			publicSubCommand(::ServerConfigArgs) {
 				name = "set"
 				description = "Set server config"
 				guild(TEST_SERVER_ID)
@@ -72,7 +72,7 @@ class TestExtension : Extension() {
 						}
 					}
 				}
-			}*/
+			}
 		}
 		ephemeralSlashCommand {
 			name = "reminder"

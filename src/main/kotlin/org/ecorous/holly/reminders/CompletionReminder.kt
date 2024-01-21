@@ -2,6 +2,7 @@ package org.ecorous.holly.reminders
 
 import com.kotlindiscord.kord.extensions.DISCORD_RED
 import dev.kord.common.entity.ButtonStyle
+import dev.kord.common.entity.Snowflake
 import dev.kord.core.behavior.channel.createMessage
 import dev.kord.core.behavior.reply
 import dev.kord.core.entity.channel.MessageChannel
@@ -67,7 +68,11 @@ class CompletionReminder(
 			println("Reminder might be completed!")
 			if (!completed) {
 				println("Reminder not completed!")
-				channel.id.let {
+				val channelId: Snowflake = if (DB.getConfig(TEST_SERVER_ID)?.remindersChannelId == null)
+					DB.getConfig(TEST_SERVER_ID)?.remindersChannelId!!
+				 else
+					channel.id
+				channelId.let {
 					println(it)
 					GlobalScope.launch {
 						reminderMessage?.let { message ->

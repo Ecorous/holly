@@ -65,6 +65,14 @@ open class DiscordReminder(
 
 
 	override suspend fun run() {
-		reminderMessage = Reminders.send(this, channel)
+		if (DB.getConfig(TEST_SERVER_ID)?.remindersChannelId != null){
+			DB.getConfig(TEST_SERVER_ID)?.remindersChannelId?.let {
+				bot.kordRef.getChannelOf<MessageChannel>(it)?.let { channel ->
+					reminderMessage = Reminders.send(this, channel)
+				}
+			}
+		} else {
+			reminderMessage = Reminders.send(this, channel)
+		}
 	}
 }
