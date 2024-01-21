@@ -6,7 +6,6 @@ import com.kotlindiscord.kord.extensions.DISCORD_RED
 import com.kotlindiscord.kord.extensions.DISCORD_YELLOW
 import com.kotlindiscord.kord.extensions.commands.Arguments
 import com.kotlindiscord.kord.extensions.commands.application.slash.converters.impl.optionalStringChoice
-import com.kotlindiscord.kord.extensions.commands.application.slash.converters.impl.stringChoice
 import com.kotlindiscord.kord.extensions.commands.application.slash.ephemeralSubCommand
 import com.kotlindiscord.kord.extensions.commands.application.slash.publicSubCommand
 import com.kotlindiscord.kord.extensions.commands.converters.impl.*
@@ -26,8 +25,14 @@ import dev.kord.rest.builder.message.embed
 import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
-import org.ecorous.holly.*
-import org.ecorous.holly.reminders.*
+import org.ecorous.holly.DB
+import org.ecorous.holly.Frequency
+import org.ecorous.holly.ServerConfig
+import org.ecorous.holly.TEST_SERVER_ID
+import org.ecorous.holly.reminders.CompletionReminder
+import org.ecorous.holly.reminders.DiscordReminder
+import org.ecorous.holly.reminders.DiscordRepeatingReminder
+import org.ecorous.holly.reminders.Reminders
 
 val SERVER_CONFIG_ERROR: EmbedBuilder.() -> Unit = {
 	title = "Error"
@@ -92,26 +97,28 @@ class TestExtension : Extension() {
 							}
 							return@action
 						}
-						Reminders.schedule(CompletionReminder(
-							dueTime,
-							arguments.title,
-							arguments.message.replace("@USER@", user.mention),
-							Frequency.ofDateTimePeriod(arguments.repeatingInterval!!),
-							Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()),
-							event.interaction.channel.asChannel(),
-							onCompletion = {
-								embed {
-									title = "Reminder completed!"
-									description = "Your reminder \"${arguments.title}\" was completed."
-									color = DISCORD_GREEN
-								}
-								actionRow {
-									interactionButton(ButtonStyle.Success, "disabled") {
-										label = "Complete"
-										disabled = true
+						Reminders.schedule(
+							CompletionReminder(
+								dueTime,
+								arguments.title,
+								arguments.message.replace("@USER@", user.mention),
+								Frequency.ofDateTimePeriod(arguments.repeatingInterval!!),
+								Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()),
+								event.interaction.channel.asChannel(),
+								onCompletion = {
+									embed {
+										title = "Reminder completed!"
+										description = "Your reminder \"${arguments.title}\" was completed."
+										color = DISCORD_GREEN
 									}
-								}
-							}
+									actionRow {
+										interactionButton(ButtonStyle.Success, "disabled") {
+											label = "Complete"
+											disabled = true
+										}
+									}
+								})
+						)
 					} else {
 						if (arguments.mode == "repeating") {
 							if (arguments.repeatingInterval == null) {
@@ -158,7 +165,8 @@ class TestExtension : Extension() {
 							}
 							field {
 								name = "Due Time"
-								value = dueTime.toDiscord(TimestampType.Default) + " (${dueTime.toDiscord(TimestampType.RelativeTime)})"
+								value =
+									dueTime.toDiscord(TimestampType.Default) + " (${dueTime.toDiscord(TimestampType.RelativeTime)})"
 							}
 							if (arguments.repeatingInterval != null) {
 								field {
@@ -184,7 +192,7 @@ class TestExtension : Extension() {
 					}
 				}
 			}
-			ephemeralSubCommand(::RemoveReminderArgs){
+			ephemeralSubCommand(::RemoveReminderArgs) {
 				name = "remove"
 				description = "remove a reminder"
 				action {
