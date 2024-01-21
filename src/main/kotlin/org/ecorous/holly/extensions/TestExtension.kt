@@ -103,6 +103,7 @@ class TestExtension : Extension() {
 								}
 							}
 						})
+						Reminders.checkAll()
 					} else {
 						if (arguments.mode == "repeating") {
 							Reminders.schedule(
