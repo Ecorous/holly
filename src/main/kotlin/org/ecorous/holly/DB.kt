@@ -41,7 +41,6 @@ object DB {
 			}
 			Tables.ServerConfig.insert {
 				it[serverId] = serverConfig.serverId.value.toLong()
-				it[remindersChannelId] = serverConfig.remindersChannelId.value.toLong()
 			}
 		}
 	}

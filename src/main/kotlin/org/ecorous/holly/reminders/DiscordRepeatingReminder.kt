@@ -3,6 +3,7 @@ package org.ecorous.holly.reminders
 import com.kotlindiscord.kord.extensions.DISCORD_PINK
 import com.kotlindiscord.kord.extensions.time.TimestampType
 import com.kotlindiscord.kord.extensions.time.toDiscord
+import dev.kord.core.entity.channel.MessageChannel
 import dev.kord.rest.builder.message.create.MessageCreateBuilder
 import dev.kord.rest.builder.message.embed
 import kotlinx.datetime.Instant
@@ -17,8 +18,9 @@ open class DiscordRepeatingReminder(
 	title: String,
 	message: String,
 	val frequency: Frequency,
-	lastCompleted: LocalDateTime
-) : DiscordReminder(dueTime, title, message, lastCompleted) {
+	lastCompleted: LocalDateTime,
+	channel: MessageChannel
+) : DiscordReminder(dueTime, title, message, lastCompleted, channel) {
 	override suspend fun run() {
 		super.run()
 		dueTime += frequency.toSeconds().seconds
@@ -30,10 +32,6 @@ open class DiscordRepeatingReminder(
 			embed {
 				title = this@DiscordRepeatingReminder.title
 				description = message
-				field {
-					name = "Frequency"
-					value = frequency.toString()
-				}
 				field {
 					name = "Last completed"
 					value = lastCompleted.dateTimeFormat

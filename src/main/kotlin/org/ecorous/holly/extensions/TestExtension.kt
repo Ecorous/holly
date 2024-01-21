@@ -55,7 +55,7 @@ class TestExtension : Extension() {
 			name = "config"
 			description = "Server config commands"
 			guild(TEST_SERVER_ID)
-			publicSubCommand(::ServerConfigArgs) {
+			/*publicSubCommand(::ServerConfigArgs) {
 				name = "set"
 				description = "Set server config"
 				guild(TEST_SERVER_ID)
@@ -72,7 +72,7 @@ class TestExtension : Extension() {
 						}
 					}
 				}
-			}
+			}*/
 		}
 		ephemeralSlashCommand {
 			name = "reminder"
@@ -83,16 +83,17 @@ class TestExtension : Extension() {
 				action {
 					val dueTime = Clock.System.now().plus(arguments.time.toDuration(TimeZone.currentSystemDefault()))
 					if (arguments.mode == "completion") {
-						Reminders.schedule(CompletionReminder.new {
-							this.dueTime = dueTime
-							title = arguments.title
-							frequency = Frequency.ofDateTimePeriod(arguments.repeatingInterval!!)
-							message = arguments.message.replace("@USER@", user.mention)
-							lastCompleted = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
-							completion {
+						Reminders.schedule(CompletionReminder(
+							dueTime,
+							arguments.title,
+							arguments.message.replace("@USER@", user.mention),
+							Frequency.ofDateTimePeriod(arguments.repeatingInterval!!),
+							Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()),
+							event.interaction.channel.asChannel(),
+							onCompletion = {
 								embed {
 									title = "Reminder completed!"
-									description = "Your reminder \"${this@new.title}\" was completed."
+									description = "Your reminder \"${arguments.title}\" was completed."
 									color = DISCORD_GREEN
 								}
 								actionRow {
@@ -102,7 +103,7 @@ class TestExtension : Extension() {
 									}
 								}
 							}
-						})
+						))
 					} else {
 						if (arguments.mode == "repeating") {
 							Reminders.schedule(
@@ -111,7 +112,8 @@ class TestExtension : Extension() {
 									arguments.title,
 									arguments.message.replace("@USER@", user.mention),
 									Frequency.ofDateTimePeriod(arguments.repeatingInterval!!),
-									Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
+									Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()),
+									event.interaction.channel.asChannel()
 								)
 							)
 						} else {
@@ -120,7 +122,8 @@ class TestExtension : Extension() {
 									dueTime,
 									arguments.title,
 									arguments.message.replace("@USER@", user.mention),
-									Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
+									Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()),
+									event.interaction.channel.asChannel()
 								)
 							)
 						}

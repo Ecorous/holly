@@ -9,6 +9,7 @@ import com.kotlindiscord.kord.extensions.time.toDiscord
 import dev.kord.common.entity.ButtonStyle
 import dev.kord.core.behavior.MessageBehavior
 import dev.kord.core.entity.Message
+import dev.kord.core.entity.channel.Channel
 import dev.kord.core.entity.channel.MessageChannel
 import dev.kord.rest.builder.message.create.MessageCreateBuilder
 import dev.kord.rest.builder.message.create.UserMessageCreateBuilder
@@ -26,7 +27,8 @@ open class DiscordReminder(
 	dueTime: Instant,
 	val title: String,
 	val message: String,
-	val lastCompleted: LocalDateTime
+	val lastCompleted: LocalDateTime,
+	val channel: MessageChannel
 ) : Reminder(null, dueTime) {
 
 	var reminderMessage: Message? = null
@@ -63,10 +65,6 @@ open class DiscordReminder(
 
 
 	override suspend fun run() {
-		DB.getConfig(TEST_SERVER_ID)?.remindersChannelId?.let {
-			bot.kordRef.getChannelOf<MessageChannel>(it)?.let { channel ->
-				reminderMessage = Reminders.send(this, channel)
-			}
-		}
+		reminderMessage = Reminders.send(this, channel)
 	}
 }

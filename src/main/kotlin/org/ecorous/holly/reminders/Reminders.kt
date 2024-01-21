@@ -58,6 +58,9 @@ object Reminders {
 
 	fun cancel(reminder: Reminder) {
 		reminders.remove(reminder)
+		if (reminder is CompletionReminder && reminder.completionReminder != null) {
+			reminders.remove(reminder.completionReminder)
+		}
 	}
 
 	suspend fun complete(reminder: CompletionReminder) {
