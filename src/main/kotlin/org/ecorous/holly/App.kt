@@ -42,43 +42,15 @@ suspend fun main() {
 		}
 	}
 
-	val timer = Timer()
-	// check every 10 seconds
-	// this is because 1 minute is the minimum frequency
-	// we will always be accurate to within 10 seconds.
-	// This is as accurate as we can be without wasting resources.
-	/*timer.schedule(0.toLong(), 10000.toLong()) {
-		val nextCheck = (Clock.System.now()+ 10.seconds).toLocalDateTime(TimeZone.currentSystemDefault())
-		println("Checking reminders...")
-		println("Next check: ${nextCheck.hour}:${nextCheck.minute}:${nextCheck.second}")
-		GlobalScope.launch {
-			Reminders.checkAll()
-		}
-	}*/
 	/*Reminders.schedule(CompletionReminder.new {
-		title = "Test Reminder (non-repeating)"
+		title = "Test Reminder (completion)"
 		message = "This is a test reminder!"
-		frequency = Frequency(FrequencyType.MINUTE, 1)
-		lastCompleted = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
-		dueTime = Clock.System.now() + 1.minutes
-		completion {
-			embed {
-				title = "Reminder completed!"
-				description = "Your reminder \"${title}\" was completed."
-				color = DISCORD_GREEN
-			}
-		}
-	})*/
-	Reminders.schedule(CompletionReminder.new {
-		title = "Test Reminder (repeating)"
-		message = "This is a test reminder!"
-		frequency = Frequency(FrequencyType.MINUTE, 2)
 		lastCompleted = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
 		dueTime = Clock.System.now() + 2.minutes
 		completion {
 			embed {
 				title = "Reminder completed!"
-				description = "Your reminder \"${title}\" was completed."
+				description = "Your reminder \"${this@new.title}\" was completed."
 				color = DISCORD_GREEN
 			}
 			actionRow {
@@ -88,7 +60,7 @@ suspend fun main() {
 				}
 			}
 		}
-	})
+	})*/
 	bot.start()
 }
 

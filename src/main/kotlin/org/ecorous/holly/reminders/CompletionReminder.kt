@@ -28,22 +28,8 @@ class CompletionReminder(
 ) : DiscordRepeatingReminder(dueTime, title, message, frequency, lastCompleted) {
 	var completed = false
 	var completionReminder: Reminder? = null
-	var buttonId: String = ""
 	val random = Random(324)
-	/*constructor(
-		dueTime: Instant?,
-		title: String?,
-		message: String?,
-		frequency: Frequency?,
-		lastCompleted: LocalDateTime?
-	) {
-		super(dueTime, title, message, frequency, lastCompleted)
-		schedule(Reminder({
-			if (!completed) {
-				// remind...
-			}
-		}, Instant.now().plusSeconds(5 * 60)).also { completionReminder = it })
-	}*/
+	var buttonId: String = refreshButtonId()
 
 	fun refreshButtonId(): String {
 		val i = random.nextInt()
@@ -55,6 +41,10 @@ class CompletionReminder(
 			super.format()()
 			formatComplete()()
 		}
+	}
+
+	fun getReminderTitle(): String {
+		return title
 	}
 
 	fun formatComplete(): MessageCreateBuilder.() -> Unit {
@@ -84,7 +74,7 @@ class CompletionReminder(
 								embed {
 									title = "Reminder not completed!"
 									description =
-										"Your reminder \"${this@CompletionReminder.title}\" was not completed. Please complete it as soon as possible."
+										"Your reminder \"${getReminderTitle()}\" was not completed. Please complete it as soon as possible."
 									color = DISCORD_RED
 								}
 							}
@@ -96,7 +86,7 @@ class CompletionReminder(
 								embed {
 									this@embed.title = "Reminder not completed!"
 									description =
-										"Your reminder \"${title}\" was not completed. Please complete it as soon as possible."
+										"Your reminder \"${getReminderTitle()}\" was not completed. Please complete it as soon as possible."
 									color = DISCORD_RED
 									footer {
 										text = "Notice: could not find the original message."
@@ -114,7 +104,7 @@ class CompletionReminder(
 
 	override suspend fun run() {
 		completed = false
-		buttonId = refreshButtonId()
+		//buttonId = refreshButtonId()
 		super.run()
 		completionReminder?.let { Reminders.cancel(it) }
 		scheduleCompletionReminder()
