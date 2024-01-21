@@ -24,7 +24,7 @@ import kotlin.time.Duration.Companion.seconds
 
 @OptIn(DelicateCoroutinesApi::class)
 object Reminders {
-	val reminders: MutableList<Reminder> = ArrayList()
+	val reminders = mutableListOf<Reminder>()
 
 	suspend fun send(reminder: DiscordReminder, channel: MessageChannel): Message {
 		return channel.createMessage(reminder.format())
@@ -58,9 +58,6 @@ object Reminders {
 
 	fun cancel(reminder: Reminder) {
 		reminders.remove(reminder)
-		if (reminder is CompletionReminder){
-			CompletionReminderStorage.reminders.remove(reminder)
-		}
 	}
 
 	suspend fun complete(reminder: CompletionReminder) {
@@ -70,11 +67,10 @@ object Reminders {
 //			bot.kordRef.getChannelOf<MessageChannel>(it)?.createMessage(reminder.onCompletion)
 //		}
 		reminder.reminderMessage?.edit(reminder.onCompletion)
-		cancel(reminder)
 	}
 
 	fun getRemindersList(): MutableList<EmbedBuilder.Field> {
-		val list: MutableList<EmbedBuilder.Field> = ArrayList()
+		val list = mutableListOf<EmbedBuilder.Field>()
 
 		if (reminders.isEmpty()){
 			val f: EmbedBuilder.Field = EmbedBuilder.Field()

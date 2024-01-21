@@ -9,13 +9,14 @@ class CompletionReminderBuilder {
 	var dueTime: Instant? = null
 	var title: String? = null
 	var message: String? = null
+	var frequency: Frequency? = null
 	var lastCompleted: LocalDateTime? = null
 	private var onCompletion: UserMessageModifyBuilder.() -> Unit = {}
 
 
 
 	fun build(): CompletionReminder {
-		return CompletionReminder(dueTime!!, title!!, message!!, lastCompleted!!, onCompletion)
+		return CompletionReminder(dueTime!!, title!!, message!!, frequency!!, lastCompleted!!, onCompletion)
 	}
 
 	fun completion(c: UserMessageModifyBuilder.() -> Unit) {

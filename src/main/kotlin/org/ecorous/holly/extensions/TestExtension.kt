@@ -86,6 +86,7 @@ class TestExtension : Extension() {
 						Reminders.schedule(CompletionReminder.new {
 							this.dueTime = dueTime
 							title = arguments.title
+							frequency = Frequency.ofDateTimePeriod(arguments.repeatingInterval!!)
 							message = arguments.message.replace("@USER@", user.mention)
 							lastCompleted = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
 							completion {
@@ -139,6 +140,12 @@ class TestExtension : Extension() {
 								name = "Due Time"
 								value = dueTime.toDiscord(TimestampType.Default) + " (${dueTime.toDiscord(TimestampType.RelativeTime)})"
 							}
+							if (arguments.repeatingInterval != null) {
+								field {
+									name = "Frequency"
+									value = Frequency.ofDateTimePeriod(arguments.repeatingInterval!!).toString()
+								}
+							}
 							color = DISCORD_YELLOW
 						}
 					}
@@ -172,7 +179,7 @@ class TestExtension : Extension() {
 		event<ButtonInteractionCreateEvent> {
 			action {
 				println("hewwo! ${event.interaction.componentId}, ${event.interaction.componentType}")
-				CompletionReminderStorage.reminders.filter {
+				Reminders.reminders.filterIsInstance<CompletionReminder>().filter {
 					it.buttonId == event.interaction.componentId
 				}.forEach { reminder ->
 					println("r1")

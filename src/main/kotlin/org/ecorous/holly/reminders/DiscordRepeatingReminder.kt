@@ -43,6 +43,10 @@ open class DiscordRepeatingReminder(
 					value = "${dueTime.toDiscord(TimestampType.Default)} (${dueTime.toDiscord(
 						TimestampType.RelativeTime)})"
 				}
+				field {
+					name = "Frequency"
+					value = frequency.toString()
+				}
 				color = DISCORD_PINK
 			}
 

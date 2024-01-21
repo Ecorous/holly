@@ -22,9 +22,10 @@ class CompletionReminder(
 	dueTime: Instant,
 	title: String,
 	message: String,
+	frequency: Frequency,
 	lastCompleted: LocalDateTime,
 	val onCompletion: UserMessageModifyBuilder.() -> Unit
-) : DiscordReminder(dueTime, title, message, lastCompleted) {
+) : DiscordRepeatingReminder(dueTime, title, message, frequency, lastCompleted) {
 	var completed = false
 	var completionReminder: Reminder? = null
 	val random = Random(324)
@@ -102,9 +103,8 @@ class CompletionReminder(
 	}
 
 	override suspend fun run() {
-		//completed = false
+		completed = false
 		//buttonId = refreshButtonId()
-		CompletionReminderStorage.reminders.add(this)
 		super.run()
 		completionReminder?.let { Reminders.cancel(it) }
 		scheduleCompletionReminder()
