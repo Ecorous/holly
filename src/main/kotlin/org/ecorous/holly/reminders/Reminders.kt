@@ -42,10 +42,6 @@ object Reminders {
 		reminders.add(reminder)
 	}
 
-	fun schedule(task: Runnable?, time: Instant) {
-		reminders.add(Reminder(task, time))
-	}
-
 	fun checkAll() {
 		reminders.stream().filter { it.isDue() }
 			.forEach { GlobalScope.launch {
@@ -58,6 +54,9 @@ object Reminders {
 
 	fun cancel(reminder: Reminder) {
 		reminders.remove(reminder)
+		if (reminder is CompletionReminder) {
+			reminder.completionReminder?.let { cancel(it) }
+		}
 	}
 
 	suspend fun complete(reminder: CompletionReminder) {
@@ -92,7 +91,7 @@ object Reminders {
 	}
 
 	fun remove(index: Int) {
-		reminders.removeAt(index)
+		cancel(reminders[index])
 	}
 }
 

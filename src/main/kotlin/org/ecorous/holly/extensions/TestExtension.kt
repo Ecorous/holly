@@ -83,16 +83,26 @@ class TestExtension : Extension() {
 				action {
 					val dueTime = Clock.System.now().plus(arguments.time.toDuration(TimeZone.currentSystemDefault()))
 					if (arguments.mode == "completion") {
-						Reminders.schedule(CompletionReminder.new {
-							this.dueTime = dueTime
-							title = arguments.title
-							frequency = Frequency.ofDateTimePeriod(arguments.repeatingInterval!!)
-							message = arguments.message.replace("@USER@", user.mention)
-							lastCompleted = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
-							completion {
+						if (arguments.repeatingInterval == null) {
+							respond {
+								embed {
+									title = "Failed to register reminder!"
+									description = "Completion reminders require a repeating interval to be set!"
+								}
+							}
+							return@action
+						}
+						Reminders.schedule(CompletionReminder(
+							dueTime,
+							arguments.title,
+							arguments.message.replace("@USER@", user.mention),
+							Frequency.ofDateTimePeriod(arguments.repeatingInterval!!),
+							Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()),
+							event.interaction.channel.asChannel(),
+							onCompletion = {
 								embed {
 									title = "Reminder completed!"
-									description = "Your reminder \"${this@new.title}\" was completed."
+									description = "Your reminder \"${arguments.title}\" was completed."
 									color = DISCORD_GREEN
 								}
 								actionRow {
@@ -102,17 +112,25 @@ class TestExtension : Extension() {
 									}
 								}
 							}
-						})
-						Reminders.checkAll()
 					} else {
 						if (arguments.mode == "repeating") {
+							if (arguments.repeatingInterval == null) {
+								respond {
+									embed {
+										title = "Failed to register reminder!"
+										description = "Repeating reminders require a repeating interval to be set!"
+									}
+								}
+								return@action
+							}
 							Reminders.schedule(
 								DiscordRepeatingReminder(
 									dueTime,
 									arguments.title,
 									arguments.message.replace("@USER@", user.mention),
 									Frequency.ofDateTimePeriod(arguments.repeatingInterval!!),
-									Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
+									Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()),
+									event.interaction.channel.asChannel()
 								)
 							)
 						} else {
@@ -121,7 +139,8 @@ class TestExtension : Extension() {
 									dueTime,
 									arguments.title,
 									arguments.message.replace("@USER@", user.mention),
-									Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
+									Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()),
+									event.interaction.channel.asChannel()
 								)
 							)
 						}

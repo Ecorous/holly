@@ -1,5 +1,6 @@
 package org.ecorous.holly.reminders
 
+import dev.kord.core.entity.channel.MessageChannel
 import dev.kord.rest.builder.message.modify.UserMessageModifyBuilder
 import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDateTime
@@ -11,12 +12,13 @@ class CompletionReminderBuilder {
 	var message: String? = null
 	var frequency: Frequency? = null
 	var lastCompleted: LocalDateTime? = null
+	var channel: MessageChannel? = null
 	private var onCompletion: UserMessageModifyBuilder.() -> Unit = {}
 
 
 
 	fun build(): CompletionReminder {
-		return CompletionReminder(dueTime!!, title!!, message!!, frequency!!, lastCompleted!!, onCompletion)
+		return CompletionReminder(dueTime!!, title!!, message!!, frequency!!, lastCompleted!!, channel!!, onCompletion)
 	}
 
 	fun completion(c: UserMessageModifyBuilder.() -> Unit) {
