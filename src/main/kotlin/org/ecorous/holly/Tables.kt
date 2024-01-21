@@ -13,7 +13,6 @@ object Tables {
 
 	object ServerConfig: Table() {
 		val serverId = long("server_id")
-		val remindersChannelId = long("reminders_channel_id")
 
 		override val primaryKey = PrimaryKey(serverId)
 	}

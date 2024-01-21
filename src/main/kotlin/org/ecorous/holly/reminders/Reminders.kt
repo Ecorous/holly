@@ -42,10 +42,6 @@ object Reminders {
 		reminders.add(reminder)
 	}
 
-	fun schedule(task: Runnable?, time: Instant) {
-		reminders.add(Reminder(task, time))
-	}
-
 	fun checkAll() {
 		reminders.stream().filter { it.isDue() }
 			.forEach { GlobalScope.launch {
