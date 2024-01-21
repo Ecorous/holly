@@ -112,7 +112,6 @@ class TestExtension : Extension() {
 									}
 								}
 							}
-						))
 					} else {
 						if (arguments.mode == "repeating") {
 							if (arguments.repeatingInterval == null) {
