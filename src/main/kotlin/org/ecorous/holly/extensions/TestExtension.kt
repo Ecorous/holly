@@ -83,6 +83,15 @@ class TestExtension : Extension() {
 				action {
 					val dueTime = Clock.System.now().plus(arguments.time.toDuration(TimeZone.currentSystemDefault()))
 					if (arguments.mode == "completion") {
+						if (arguments.repeatingInterval == null) {
+							respond {
+								embed {
+									title = "Failed to register reminder!"
+									description = "Completion reminders require a repeating interval to be set!"
+								}
+							}
+							return@action
+						}
 						Reminders.schedule(CompletionReminder(
 							dueTime,
 							arguments.title,
@@ -106,117 +115,23 @@ class TestExtension : Extension() {
 						))
 					} else {
 						if (arguments.mode == "repeating") {
-							Reminders.schedule(
-								DiscordRepeatingReminder(
-									dueTime,
-									arguments.title,
-									arguments.message.replace("@USER@", user.mention),
-									Frequency.ofDateTimePeriod(arguments.repeatingInterval!!),
-									Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()),
-									event.interaction.channel.asChannel()
-								)
-							)
-						} else {
-							Reminders.schedule(
-								DiscordReminder(
-									dueTime,
-									arguments.title,
-									arguments.message.replace("@USER@", user.mention),
-									Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()),
-									event.interaction.channel.asChannel()
-								)
-							)
-						}
-					}
-					respond {
-						embed {
-							title = "Reminder Scheduled!"
-							field {
-								name = "Title"
-								value = arguments.title
-							}
-							field {
-								name = "Message"
-								value = arguments.message.replace("@USER@", user.mention)
-							}
-							field {
-								name = "Due Time"
-								value = dueTime.toDiscord(TimestampType.Default) + " (${dueTime.toDiscord(TimestampType.RelativeTime)})"
-							}
-							if (arguments.repeatingInterval != null) {
-								field {
-									name = "Frequency"
-									value = Frequency.ofDateTimePeriod(arguments.repeatingInterval!!).toString()
-								}
-							}
-							color = DISCORD_YELLOW
-						}
-					}
-				}
-			}
-			ephemeralSubCommand {
-				name = "list"
-				description = "List Reminders"
-				action {
-					respond {
-						embed {
-							title = "Registered Reminders"
-							fields.addAll(Reminders.getRemindersList())
-							color = DISCORD_FUCHSIA
-						}
-					}
-				}
-			}
-			ephemeralSubCommand(::RemoveReminderArgs){
-				name = "remove"
-				description = "remove a reminder"
-				action {
-					Reminders.remove(arguments.reminderId.toInt())
-					respond {
-						content = "Reminder removed!"
-					}
-				}
-			}
-
-		}
-		ephemeralSlashCommand {
-			name = "reminder"
-			description = "Configure reminders"
-			ephemeralSubCommand(::AddReminderArgs) {
-				name = "add"
-				description = "Add a new reminder"
-				action {
-					val dueTime = Clock.System.now().plus(arguments.time.toDuration(TimeZone.currentSystemDefault()))
-					if (arguments.mode == "completion") {
-						Reminders.schedule(CompletionReminder.new {
-							this.dueTime = dueTime
-							title = arguments.title
-							frequency = Frequency.ofDateTimePeriod(arguments.repeatingInterval!!)
-							message = arguments.message.replace("@USER@", user.mention)
-							lastCompleted = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
-							completion {
-								embed {
-									title = "Reminder completed!"
-									description = "Your reminder \"${this@new.title}\" was completed."
-									color = DISCORD_GREEN
-								}
-								actionRow {
-									interactionButton(ButtonStyle.Success, "disabled") {
-										label = "Complete"
-										disabled = true
+							if (arguments.repeatingInterval == null) {
+								respond {
+									embed {
+										title = "Failed to register reminder!"
+										description = "Repeating reminders require a repeating interval to be set!"
 									}
 								}
+								return@action
 							}
-						})
-					} else {
-						if (arguments.mode == "repeating") {
 							Reminders.schedule(
 								DiscordRepeatingReminder(
 									dueTime,
 									arguments.title,
 									arguments.message.replace("@USER@", user.mention),
 									Frequency.ofDateTimePeriod(arguments.repeatingInterval!!),
-									Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
+									Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()),
+									event.interaction.channel.asChannel()
 								)
 							)
 						} else {
@@ -225,7 +140,8 @@ class TestExtension : Extension() {
 									dueTime,
 									arguments.title,
 									arguments.message.replace("@USER@", user.mention),
-									Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
+									Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()),
+									event.interaction.channel.asChannel()
 								)
 							)
 						}

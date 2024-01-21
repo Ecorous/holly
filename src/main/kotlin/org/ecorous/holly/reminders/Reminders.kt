@@ -58,8 +58,8 @@ object Reminders {
 
 	fun cancel(reminder: Reminder) {
 		reminders.remove(reminder)
-		if (reminder is CompletionReminder && reminder.completionReminder != null) {
-			reminders.remove(reminder.completionReminder)
+		if (reminder is CompletionReminder) {
+			reminder.completionReminder?.let { cancel(it) }
 		}
 	}
 
@@ -95,7 +95,7 @@ object Reminders {
 	}
 
 	fun remove(index: Int) {
-		reminders.removeAt(index)
+		cancel(reminders[index])
 	}
 }
 
